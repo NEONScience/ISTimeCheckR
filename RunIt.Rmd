@@ -1,0 +1,34 @@
+---
+title: "NEON_TimeStampCheck"
+author: "Kevin Styers"
+date: "1/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(reticulate)
+library(data.table)
+```
+
+```{python}
+import os
+#os.getcwd()
+os.chdir('C:\\1_Data\\rawData\\')
+```
+
+```{r pythonSource}
+setwd("C:/1_Data/rawData/")
+source_python("viewdatasockD10STER.py") #, envir = parent.frame("-S 10.110.17.2","-c"))
+```
+
+```{r, EndTimes}
+endTimes <- Sys.time()
+print(endTimes)
+
+SterData <- fread("D10STERoutput.csv")
+names(SterData) <-c("TimeStamp","MacAddres","Eeprom","StreamNumber","Data")
+library(anytime)
+SterData$TimeStamp <- as.POSIXt(SterData$TimeStamp/10000000,options(digits.secs=2))
+SterData$endTime <- endTimes
+```
