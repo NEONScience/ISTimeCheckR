@@ -12,7 +12,9 @@ TimeStampCheck <- function(ip, password, pullTime) {
   # Grab "Start Time"
   start<-Sys.time()
   # Grab Data from live port
-  ssh::ssh_exec_wait(session, command = paste0("nc localhost 30000 & sleep ",pullTime,"s; kill $!"), std_out = paste0("C:/GitHub/ISTimeCheckR/ins/input.txt"),std_err = stderr())
+  ssh::ssh_exec_wait(session, command = paste0("nc localhost 30000 & sleep ",pullTime,"s; kill $!"), 
+                     std_out = paste0("C:/GitHub/ISTimeCheckR/ins/input.txt"),
+                     std_err = stderr())
   # Grab "End Time"
   end <- Sys.time()
   # Courtesty Disc
@@ -71,7 +73,7 @@ TimeStampCheck <- function(ip, password, pullTime) {
 # TimeStampCheck(ip = "10.110.17.2",password = "resuresu",pullTime = "2")
 
 metaData <- fread("C:/GitHub/ISTimeCheckR/metadata.csv")
-for(i in metaData$ipAddress[1:1]){
+for(i in metaData$ipAddress[10:47]){
   TimeStampCheck(ip = i, password = "resuresu",pullTime = "2")
 }
 
@@ -82,15 +84,25 @@ for(i in metaData$ipAddress[1:1]){
 file_names <- list.files("C:/GitHub/ISTimeCheckR/reports/",pattern="*.csv")
 
 # Import Data -- Assign 'files' to the product of reading though all of the csv's in 'file_names'
+setwd("C:/GitHub/ISTimeCheckR/reports/")
 files = lapply(file_names, fread, header=T, stringsAsFactors = F)
 # Import Data -- Bind all of the csv object together
 files = rbindlist(files, fill = TRUE)
-timeData <- files %>% distinct() %>% filter(diffTime >20)
+
+files$TimeStamp <- as.POSIXct(files$TimeStamp, tz="UTC")
+files$StartTime <- as.POSIXct(files$StartTime, tz="UTC")
+files$EndTime <- as.POSIXct(files$EndTime, tz="UTC")
+files$diffTime <- round(files$diffTime, 2)
+
+# Filter to just find data with time differences greater than n
+n <- 60
+timeData <- files %>% distinct() %>% filter(diffTime > n)
 
 
-analysisPlot <- ggplot2::ggplot(data=timeData,aes(x=diffTime/60, fill = siteID,text=MacAddres))+
-  ggplot2::geom_histogram(bins = 10)+
-  ggplot2::labs(x = "Difference between Time final and LC time (minutes)", 
+analysisPlot <- ggplot2::ggplot(data=timeData,aes(x=diffTime, fill = siteID,text=MacAddress))+
+  ggplot2::geom_histogram(bins = 5, binwidth = 2)+
+  ggplot2::labs(x = "Difference between Time final and LC time (seconds)", 
                 "Number of Streams", 
                 title = paste0("Time Difference Analysis"))
 ggplotly(analysisPlot)
+str(timeData)
