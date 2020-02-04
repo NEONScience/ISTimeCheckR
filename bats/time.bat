@@ -1,3 +1,3 @@
-cd /GitHub/TimeCheck/scripts
+cd /GitHub/ISTimeCheckR/scripts
 
-python viewDSNY.py -f C:/GitHub/TimeCheck/ins/input.txt -c
+python viewData.py -f C:/GitHub/ISTimeCheckR/ins/input.txt -c

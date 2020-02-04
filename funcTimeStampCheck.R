@@ -12,17 +12,17 @@ TimeStampCheck <- function(ip, password, pullTime) {
   # Grab "Start Time"
   start<-Sys.time()
   # Grab Data from live port
-  ssh::ssh_exec_wait(session, command = paste0("nc localhost 30000 & sleep ",pullTime,"s; kill $!"), std_out = paste0("C:/GitHub/TimeCheck/ins/input.txt"),std_err = stderr())
+  ssh::ssh_exec_wait(session, command = paste0("nc localhost 30000 & sleep ",pullTime,"s; kill $!"), std_out = paste0("C:/GitHub/ISTimeCheckR/ins/input.txt"),std_err = stderr())
   # Grab "End Time"
   end <- Sys.time()
   # Courtesty Disc
   ssh::ssh_disconnect(session)
   
   # Start batch script to Run Python
-  shell.exec("C:/GitHub/TimeCheck/bats/time.bat")
+  shell.exec("C:/GitHub/ISTimeCheckR/bats/time.bat")
   
   # Matchup IP and SiteID
-  metaData <- fread("C:/GitHub/TimeCheck/metadata.csv")
+  metaData <- fread("C:/GitHub/ISTimeCheckR/metadata.csv")
   siteIDz <- metaData %>%
     filter(ipAddress == ip) %>%
     select(siteID)
@@ -33,9 +33,9 @@ TimeStampCheck <- function(ip, password, pullTime) {
   Sys.sleep(as.numeric(pullTime)*2.5)
   
   # Read in data that's been converted from binary to CSV
-  f <- fread("C:/GitHub/TimeCheck/outs/output.csv", header = FALSE)
+  f <- fread("C:/GitHub/ISTimeCheckR/outs/output.csv", header = FALSE)
   # Grab the inputs/outputs from previous steps
-  NandOut <- c("C:/GitHub/TimeCheck/outs/output.csv","C:/GitHub/TimeCheck/ins/input.txt")
+  NandOut <- c("C:/GitHub/ISTimeCheckR/outs/output.csv","C:/GitHub/ISTimeCheckR/ins/input.txt")
   # Delete those files
   for(i in NandOut){
     file.remove(i)
@@ -58,7 +58,7 @@ TimeStampCheck <- function(ip, password, pullTime) {
     mutate(diffTime = difftime(EndTime,TimeStamp)) %>%
     mutate(siteID = siteIDz)
   
-  write.csv(ftest, paste0("C:/GitHub/TimeCheck/reports/",siteIDz,".csv"), row.names = FALSE)
+  write.csv(ftest, paste0("C:/GitHub/ISTimeCheckR/reports/",siteIDz,".csv"), row.names = FALSE)
   
   # Save histogram
   # ggplot2::ggplot(data=ftest,aes(x=diffTime))+
@@ -70,14 +70,16 @@ TimeStampCheck <- function(ip, password, pullTime) {
 
 # TimeStampCheck(ip = "10.110.17.2",password = "resuresu",pullTime = "2")
 
-metaData <- fread("C:/GitHub/TimeCheck/metadata.csv")
+metaData <- fread("C:/GitHub/ISTimeCheckR/metadata.csv")
 for(i in metaData$ipAddress[1:1]){
   TimeStampCheck(ip = i, password = "resuresu",pullTime = "2")
 }
 
 
+### Stack all the resulting data with the code below if you so chose
+
 # Grab file names from the set directory
-file_names <- list.files("C:/GitHub/TimeCheck/reports/",pattern="*.csv")
+file_names <- list.files("C:/GitHub/ISTimeCheckR/reports/",pattern="*.csv")
 
 # Import Data -- Assign 'files' to the product of reading though all of the csv's in 'file_names'
 files = lapply(file_names, fread, header=T, stringsAsFactors = F)

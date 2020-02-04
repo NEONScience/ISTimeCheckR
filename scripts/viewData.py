@@ -109,7 +109,7 @@ def main():
                 
             # Print to csv file by sensor
             if options.csvoutput:
-                fileLocation = "C:/GitHub/TimeCheck/outs/output.csv"
+                fileLocation = "C:/GitHub/ISTimeCheckR/outs/output.csv"
                 # if not os.path.isdir(fileLocation):
                 #     os.makedirs(fileLocation)
                 
