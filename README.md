@@ -19,3 +19,6 @@ Briefly holds the data pulled directory from the LC before the `viewData.py` scr
 
 #### `outs` directory
 Briefly holds the data converted from binary by the `viewData.py` script
+
+#### `reports` directory
+This holds any of the data output by the main `funcTimeStampCheck.R`, mainly csv's contain the diff time sep by site
